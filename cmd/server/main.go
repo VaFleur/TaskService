@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	_ "taskService/docs"
+	"taskService/internal/config"
 	"taskService/internal/handler"
 	"taskService/internal/repository/postgres"
 	"taskService/internal/service"
@@ -26,66 +26,82 @@ import (
 // @host localhost:8080
 // @BasePath /
 func main() {
-	dbURL := getEnv("DATABASE_URL", "postgres://user:pass@localhost:5432/tasks")
-	redisURL := getEnv("REDIS_URL", "redis://localhost:6379")
-	port := getEnv("PORT", "8080")
+	cfg, err := config.Load()
+	if err != nil {
+		log.Fatalf("Failed to load config: %v", err)
+	}
 
 	ctx := context.Background()
 
-	pool, err := pgxpool.New(ctx, dbURL)
+	// PostgreSQL Pool
+	pool, err := pgxpool.New(ctx, cfg.Database.URL)
 	if err != nil {
 		log.Fatalf("Failed to create db pool: %v", err)
 	}
 	defer pool.Close()
+	pool.Config().MaxConns = int32(cfg.Database.MaxOpenConns)
+	pool.Config().MinConns = int32(cfg.Database.MaxIdleConns)
 
-	rdb := redis.NewClient(&redis.Options{Addr: "localhost:6379"})
+	// Redis Client
+	opts, err := redis.ParseURL(cfg.Redis.URL)
+	if err != nil {
+		log.Fatalf("Invalid REDIS_URL: %v", err)
+	}
+	rdb := redis.NewClient(opts)
 	defer rdb.Close()
 
+	// Redis checkup
+	if err := rdb.Ping(ctx).Err(); err != nil {
+		log.Printf("⚠️  Redis ping failed: %v", err)
+	} else {
+		log.Println("✅ Connected to Redis")
+	}
+
+	// Layer init
 	repo := postgres.NewTaskRepo(pool)
 	svc := service.NewTaskService(repo)
 	h := handler.NewTaskHandler(svc)
 
+	// Router
 	r := chi.NewRouter()
 	r.Use(middleware.RequestID)
 	r.Use(middleware.RealIP)
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.Timeout(30 * time.Second))
+	r.Use(middleware.Timeout(30)) // chi timeout в секундах
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 	r.Mount("/tasks", h.Routes())
+	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("OK"))
+	})
 
 	srv := &http.Server{
-		Addr:         ":" + port,
+		Addr:         ":" + cfg.Server.Port,
 		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  cfg.Server.ReadTimeout,
+		WriteTimeout: cfg.Server.WriteTimeout,
+		IdleTimeout:  cfg.Server.IdleTimeout,
 	}
 
 	go func() {
-		log.Printf("🚀 Server starting on :%s", port)
+		log.Printf("🚀 Server starting on :%s", cfg.Server.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			log.Fatal(err)
 		}
 	}()
 
+	// Graceful shutdown
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 	log.Println("⏳ Shutting down server...")
 
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), 10)
 	defer cancel()
 	if err := srv.Shutdown(shutdownCtx); err != nil {
 		log.Fatal("Server forced to shutdown:", err)
 	}
 	log.Println("✅ Server exited properly")
-}
-
-func getEnv(key, fallback string) string {
-	if v := os.Getenv(key); v != "" {
-		return v
-	}
-	return fallback
 }

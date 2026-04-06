@@ -8,6 +8,7 @@ require (
 	github.com/jackc/pgx/v5 v5.9.1
 	github.com/redis/go-redis/v9 v9.18.0
 	github.com/swaggo/http-swagger/v2 v2.0.2
+	github.com/swaggo/swag v1.8.1
 	go.uber.org/mock v0.6.0
 )
 
@@ -26,7 +27,6 @@ require (
 	github.com/mailru/easyjson v0.7.6 // indirect
 	github.com/rogpeppe/go-internal v1.14.1 // indirect
 	github.com/swaggo/files/v2 v2.0.0 // indirect
-	github.com/swaggo/swag v1.8.1 // indirect
 	go.uber.org/atomic v1.11.0 // indirect
 	golang.org/x/sync v0.17.0 // indirect
 	golang.org/x/text v0.29.0 // indirect
