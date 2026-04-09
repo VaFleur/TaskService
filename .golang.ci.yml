@@ -6,3 +6,5 @@ linters:
     - ineffassign
     - staticcheck
     - unused
+run:
+  timeout: 5m
