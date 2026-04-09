@@ -1,15 +1,15 @@
 basePath: /
 definitions:
-  taskService_internal_domain.PaginatedTasks:
+  domain.PaginatedTasks:
     properties:
       data:
         items:
-          $ref: '#/definitions/taskService_internal_domain.Task'
+          $ref: '#/definitions/domain.Task'
         type: array
       pagination:
-        $ref: '#/definitions/taskService_internal_domain.Pagination'
+        $ref: '#/definitions/domain.Pagination'
     type: object
-  taskService_internal_domain.Pagination:
+  domain.Pagination:
     properties:
       limit:
         type: integer
@@ -18,7 +18,7 @@ definitions:
       total:
         type: integer
     type: object
-  taskService_internal_domain.Task:
+  domain.Task:
     properties:
       created_at:
         type: string
@@ -64,7 +64,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/taskService_internal_domain.PaginatedTasks'
+            $ref: '#/definitions/domain.PaginatedTasks'
       summary: List tasks
     post:
       consumes:
@@ -75,14 +75,14 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/taskService_internal_domain.Task'
+          $ref: '#/definitions/domain.Task'
       produces:
       - application/json
       responses:
         "201":
           description: Created
           schema:
-            $ref: '#/definitions/taskService_internal_domain.Task'
+            $ref: '#/definitions/domain.Task'
       summary: Create task
   /tasks/{id}:
     delete:
@@ -119,7 +119,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/taskService_internal_domain.Task'
+            $ref: '#/definitions/domain.Task'
         "400":
           description: Invalid ID
           schema:
@@ -143,14 +143,14 @@ paths:
         name: task
         required: true
         schema:
-          $ref: '#/definitions/taskService_internal_domain.Task'
+          $ref: '#/definitions/domain.Task'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/taskService_internal_domain.Task'
+            $ref: '#/definitions/domain.Task'
         "400":
           description: Invalid request
           schema:
