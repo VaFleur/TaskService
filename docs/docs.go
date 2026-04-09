@@ -47,7 +47,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.PaginatedTasks"
+                            "$ref": "#/definitions/taskService_internal_domain.PaginatedTasks"
                         }
                     }
                 }
@@ -67,7 +67,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.Task"
+                            "$ref": "#/definitions/taskService_internal_domain.Task"
                         }
                     }
                 ],
@@ -75,7 +75,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Created",
                         "schema": {
-                            "$ref": "#/definitions/domain.Task"
+                            "$ref": "#/definitions/taskService_internal_domain.Task"
                         }
                     }
                 }
@@ -100,7 +100,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Task"
+                            "$ref": "#/definitions/taskService_internal_domain.Task"
                         }
                     },
                     "400": {
@@ -139,7 +139,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/domain.Task"
+                            "$ref": "#/definitions/taskService_internal_domain.Task"
                         }
                     }
                 ],
@@ -147,7 +147,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/domain.Task"
+                            "$ref": "#/definitions/taskService_internal_domain.Task"
                         }
                     },
                     "400": {
@@ -199,21 +199,21 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "domain.PaginatedTasks": {
+        "taskService_internal_domain.PaginatedTasks": {
             "type": "object",
             "properties": {
                 "data": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/domain.Task"
+                        "$ref": "#/definitions/taskService_internal_domain.Task"
                     }
                 },
                 "pagination": {
-                    "$ref": "#/definitions/domain.Pagination"
+                    "$ref": "#/definitions/taskService_internal_domain.Pagination"
                 }
             }
         },
-        "domain.Pagination": {
+        "taskService_internal_domain.Pagination": {
             "type": "object",
             "properties": {
                 "limit": {
@@ -227,7 +227,7 @@ const docTemplate = `{
                 }
             }
         },
-        "domain.Task": {
+        "taskService_internal_domain.Task": {
             "type": "object",
             "properties": {
                 "created_at": {

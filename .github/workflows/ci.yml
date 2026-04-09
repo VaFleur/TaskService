@@ -28,6 +28,16 @@ jobs:
         uses: codecov/codecov-action@v4
         if: github.ref == 'refs/heads/main'
 
+      - name: Verify swagger docs are up to date
+        run: |
+          go install github.com/swaggo/swag/cmd/swag@v1.16.6
+          swag init -g cmd/server/main.go -o docs_temp --parseDependency
+          if ! diff -r docs docs_temp > /dev/null; then
+            echo "❌ Swagger docs are outdated. Run: swag init -g cmd/server/main.go -o docs"
+            exit 1
+          fi
+          rm -rf docs_temp
+
   build-and-deploy:
     needs: lint-test
     runs-on: ubuntu-latest
