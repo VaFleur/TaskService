@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"log"
 	"net/http"
 	"strconv"
 	"taskService/internal/domain"
@@ -60,7 +61,9 @@ func (h *TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(task)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		log.Printf("failed to encode response: %v", err)
+	}
 }
 
 // @Summary List tasks
@@ -96,7 +99,9 @@ func (h *TaskHandler) List(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(res)
+	if err := json.NewEncoder(w).Encode(res); err != nil {
+		log.Printf("failed to encode response: %v", err)
+	}
 }
 
 // @Summary Get task by ID
@@ -127,7 +132,9 @@ func (h *TaskHandler) GetByID(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		log.Printf("failed to encode response: %v", err)
+	}
 }
 
 // @Summary Update task
@@ -166,7 +173,9 @@ func (h *TaskHandler) Update(w http.ResponseWriter, r *http.Request) {
 	// Возвращаем обновленные данные
 	task.ID = id
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(task)
+	if err := json.NewEncoder(w).Encode(task); err != nil {
+		log.Printf("failed to encode response: %v", err)
+	}
 }
 
 // @Summary Delete task (soft delete)

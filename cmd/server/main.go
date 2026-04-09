@@ -74,7 +74,9 @@ func main() {
 	r.Mount("/tasks", h.Routes())
 	r.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("OK"))
+		if _, err := w.Write([]byte("OK")); err != nil {
+			log.Printf("failed to write health check response: %v", err)
+		}
 	})
 
 	srv := &http.Server{
