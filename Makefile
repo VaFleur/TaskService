@@ -1,7 +1,7 @@
 .PHONY: docs
 docs:
 	@echo "🔄 Generating Swagger docs..."
-	@go install github.com/swaggo/swag/cmd/swag@v1.16.4
+	@go install github.com/swaggo/swag/cmd/swag@v1.16.6
 	@swag init -g cmd/server/main.go -o docs --parseDependency
 	@echo "✅ Docs updated"
 
@@ -16,4 +16,4 @@ test:
 	@go test ./... -race -cover
 
 .PHONY: ci
-ci: lint test docs  # Полный прогон как в CI
+ci: lint test docs
